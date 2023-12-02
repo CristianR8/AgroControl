@@ -4,7 +4,6 @@ import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 import { useAuth } from "../context/authContext";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-
 import validationLogin from "../validations/ValidationLogin";
 
 export default function LoginForm() {
@@ -17,7 +16,7 @@ export default function LoginForm() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors },z
   } = useForm();
 
   useEffect(() => {
@@ -64,10 +63,18 @@ export default function LoginForm() {
           onSubmit={handleSubmit(onSubmitFunction)}
           className="max-w-[400px]-w-full mx-20 bg-amber-500 p-10 px-8 rounded-lg"
         >
+          <div className="flex justify-center items-center">
+            <img
+              src="/assets/logo.png"
+              alt="logo"
+              className="rounded-lg h-36 mb-4 hover:scale-110 duration-200"
+            />
+          </div>
+
           <h2 className="text-4xl text-gray-950 font-bold text-center">
             INICIAR SESION
           </h2>
-          <div className="flex flex-col text-gray-400 py-2">
+          <div className="flex flex-col text-gray-900 py-2">
             <label>Correo electrónico</label>
             <Input
               errors={errors}
@@ -75,11 +82,11 @@ export default function LoginForm() {
               register={register}
               nameRegister="email"
               placeholder="tucorreo@gmail.com"
-              className="w-full rounded-lg bg-gray-700 mt-2 p-2 focus:border-bñlue-500 focus:bg-gray-800 focus:outline-none"
+              className="w-full rounded-lg bg-white mt-2 p-2 focus:border-blue-500 focus:bg-gray-100 focus:outline-none"
               type="text"
             />
           </div>
-          <div className="flex flex-col text-gray-400 relative py-2">
+          <div className="flex flex-col text-gray-900 relative py-2">
             <label>Contraseña</label>
             <Input
               errors={errors}
@@ -87,10 +94,10 @@ export default function LoginForm() {
               register={register}
               nameRegister="password"
               placeholder="***********"
-              className="w-full rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline-none"
+              className="w-full rounded-lg bg-white mt-2 p-2 focus:border-blue-500 focus:bg-gray-100 focus:outline-none"
               typeInput={visible === false ? "password" : "text"}
             />
-             <div className="text-2xl absolute my-11 right-2 text-gray-400">
+            <div className="text-2xl absolute my-11 right-2 text-gray-400">
               {visible === false ? (
                 <AiOutlineEye onClick={toggle} />
               ) : (
@@ -109,16 +116,18 @@ export default function LoginForm() {
               />
               Recordarme
             </p>
-            <p className="text-gray-400 text-sm hover:cursor-pointer hover:underline hover:text-blue-800" onClick={() => navigate('/reset-pwd')}>
-             Olvidé la contraseña
+            <p
+              className="text-gray-900 text-sm hover:cursor-pointer hover:underline hover:text-blue-800"
+              onClick={() => navigate("/reset-pwd")}
+            >
+              Olvidé la contraseña
             </p>
           </div>
-          <button className="w-full my-5 py-2 bg-stone-400 shadow-lg duration-200 shadow-teal hover:shadow-teal-50/30 text-gray-800 font-bold rounded-lg">
+          <button className="w-full my-5 py-2 bg-stone-300 shadow-lg duration-200 shadow-teal hover:shadow-teal-50/70 text-gray-800 font-bold rounded-lg">
             INGRESAR
           </button>
         </form>
       </div>
     </div>
-        
   );
 }

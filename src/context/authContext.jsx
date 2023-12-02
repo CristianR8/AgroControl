@@ -24,20 +24,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const signup = async (email, password) => {
-
-    const info = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    ).then((usuarioFirebase) => {
-      return usuarioFirebase;
-    });
-
-    const docuref = await doc(firestore, `usuarios/${info.user.uid}`);
-    setDoc(docuref, { email: email, rol: "user2" });
-
-    return info;
+  const signup = (email, password) => {
+    return createUserWithEmailAndPassword(auth, email, password);
   };
 
   const login = (email, password) => {
@@ -50,31 +38,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubuscribe = onAuthStateChanged(auth, (currentUser) => {
-  
-      async function getRol(uid) {
-        const docuRef = doc(firestore, `usuarios/${uid}`);
-        const docuCifrada = await getDoc(docuRef);
-
-        if (docuCifrada.exists()) {
-          const infoFinal = docuCifrada.data().rol;
-          currentUser.role = infoFinal;
-        } else {
-          console.log("No such document!");
-        }
-
-        setUser(currentUser);
-        setLoading(false);
-      }
-
-      console.log(currentUser);
+      console.log({ currentUser });
       setUser(currentUser);
-      setLoading(true);
-      getRol(currentUser?.uid);
-  
+      setLoading(false);
     });
-
     return () => unsubuscribe();
-  
   }, []);
 
   return (
