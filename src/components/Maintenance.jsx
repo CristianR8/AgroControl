@@ -11,9 +11,9 @@ import {
   collection,
   query,
   where,
-  deleteField
+  deleteField,
 } from "firebase/firestore"; // Importa collection solo una vez
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import Return from "./Return";
 import { useAuth } from "../context/authContext";
@@ -61,8 +61,8 @@ const Maintenance = () => {
         ? "verde"
         : "amarillo"
       : currentMonth < months[fecha]
-        ? "verde"
-        : "rojo";
+      ? "verde"
+      : "rojo";
   };
 
   const retrieveData = async () => {
@@ -72,59 +72,59 @@ const Maintenance = () => {
         collection(firestore, "productos"),
         where("maintenance", "==", filter)
       );
-    } else { q = collection(firestore, "productos") }
+    } else {
+      q = collection(firestore, "productos");
+    }
 
     const querySnapshot = await getDocs(q);
 
-    let data = querySnapshot.docs.filter((doc) => {
-      return doc.data().maintenance !== undefined;
-    }).map((doc) => {
-      let type_semf = calculateSemaforizacion(doc.data().maintenance);
-      return { ...doc.data(), semaforizacion: type_semf };
-    });
+    let data = querySnapshot.docs
+      .filter((doc) => {
+        return doc.data().maintenance !== undefined;
+      })
+      .map((doc) => {
+        let type_semf = calculateSemaforizacion(doc.data().maintenance);
+        return { ...doc.data(), semaforizacion: type_semf };
+      });
 
     setReport(data);
   };
 
   const removeMaintenance = async (codigo) => {
-    console.log(codigo)
+    console.log(codigo);
     Swal.fire({
-      title: '¿Estas seguro?',
+      title: "¿Estas seguro?",
       text: "¡Esta acción removerá el producto de la tabla de mantenimiento!",
-      icon: 'warning',
+      icon: "warning",
       showDenyButton: true,
-      denyButtonText: 'Cancelar',
-      confirmButtonColor: '#3085d6',
-      denyButtonColor: '#d33',
-      confirmButtonText: 'Si, completar!'
+      denyButtonText: "Cancelar",
+      confirmButtonColor: "#3085d6",
+      denyButtonColor: "#d33",
+      confirmButtonText: "Si, completar!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         await updateDoc(doc(firestore, "productos", String(codigo)), {
-          maintenance: deleteField()
+          maintenance: deleteField(),
         });
         Swal.fire(
-          '¡Mantenimiento completado!',
-          'Se ha completado el mantenimiento.',
-          'success'
-        )
+          "¡Mantenimiento completado!",
+          "Se ha completado el mantenimiento.",
+          "success"
+        );
         retrieveData();
       }
-    })
-
-
+    });
   };
 
   useEffect(() => {
     retrieveData();
   }, [filter]);
 
-
   return (
     <CardComponent>
-      <div className="bg-gray-800 shadow-md text-white rounded-lg p-4 text-center">
-        <p className="text-3xl 2xl:text-4xl font-mono font-semibold ">
-          {" "}
-          BIENVENIDO AL MÓDULO DE CRONOGRAMA DE MANTENIMIENTO{" "}
+      <div className="bg-amber-400 shadow-md text-white rounded-lg p-4 text-center">
+        <p className="text-3xl 2xl:text-4xl font-mono text-gray-950 font-semibold ">
+          BIENVENIDO AL CRONOGRAMA DE PRODUCCIONES
         </p>
       </div>
       <div className="flex justify-items-center">
@@ -132,9 +132,9 @@ const Maintenance = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2">
             <MntFormProduct onSubmitFn={onSubmitFunction} />
 
-            <div className='max-w-[400px]-w-full h-full py-16 bg-gray-50 px-8 rounded-lg my-4 mr-4'>
-              <label className="block bg-gray-900 text-white shadow-md rounded-full p-3 mb-5 text-center text-lg font-mono font-semibold">
-                Próximos mantenimientos
+            <div className="max-w-[400px]-w-full h-full py-16 bg-gray-50 px-8 rounded-lg my-4 mr-4">
+              <label className="block bg-green-800 text-white shadow-md rounded-full p-3 mb-5 text-center text-lg font-mono font-semibold">
+                Cronograma de producciones
               </label>
               <label className="flex items-center justify-center text-gray-800 font-semibold my-8 text-lg ">
                 Mes:
@@ -163,41 +163,48 @@ const Maintenance = () => {
                 <table className="table-auto items-center">
                   <thead className="text-center justify-center items-center text-sm font-bold text-gray-900 uppercase">
                     <tr>
-                      <th className="px-4">Bodega</th>
+                      <th className="px-4">Tipo</th>
                       <th className="px-8">Código</th>
                       <th>Nombre</th>
                       <th className="px-4">Fecha</th>
                       <th className="px-2">
-                        <AiOutlineWarning data-tooltip-id="botonInfo" className="w-10 h-10" />
-                        <Tooltip id="botonInfo" style={{ height: '170px', width: '300px' }} effect="float">
+                        <AiOutlineWarning
+                          data-tooltip-id="botonInfo"
+                          className="w-10 h-10"
+                        />
+                        <Tooltip
+                          id="botonInfo"
+                          style={{ height: "170px", width: "300px" }}
+                          effect="float"
+                        >
                           <span className="flex items-center my-2">
                             <div className="w-10 h-10 rounded-full bg-green-400"></div>
-                            <label className="ml-8">Mantenimiento disponible</label>
+                            <label className="ml-8">Produccion vigente</label>
                           </span>
                           <span className="flex items-center my-2">
                             <div className="w-10 h-10 rounded-full bg-yellow-300"></div>
-                            <label className="ml-2">Mantenimiento pronto a vencer</label>
+                            <label className="ml-2">
+                              Produccion cerca a finalizar
+                            </label>
                           </span>
                           <span className="flex items-center my-2">
                             <div className="w-10 h-10 rounded-full bg-red-500"></div>
-                            <label className="ml-8">Mantenimiento atrasado</label>
+                            <label className="ml-8">
+                              Produccion finalizada
+                            </label>
                           </span>
-
-
-
                         </Tooltip>
                       </th>
-                      <th>
-                        ¿Completado?
-                      </th>
+                      <th>¿Completada?</th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.map((item, index) => (
                       <tr
                         key={index}
-                        className={`${index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                          } hover:bg-gray-900 hover:text-white transition duration-200 group`}
+                        className={`${
+                          index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                        } hover:bg-gray-900 hover:text-white transition duration-200 group`}
                       >
                         <td className="text-center whitespace-normal max-h-16">
                           {item.ciudad}
@@ -213,12 +220,13 @@ const Maintenance = () => {
                         </td>
                         <td className=" whitespace-nowrap">
                           <span
-                            className={`w-10 h-10 m-2 rounded-full inline-block ${item.semaforizacion === "verde"
-                              ? "bg-green-400"
-                              : item.semaforizacion === "amarillo"
+                            className={`w-10 h-10 m-2 rounded-full inline-block ${
+                              item.semaforizacion === "verde"
+                                ? "bg-green-400"
+                                : item.semaforizacion === "amarillo"
                                 ? "bg-yellow-300"
                                 : "bg-red-500"
-                              }`}
+                            }`}
                           ></span>
                         </td>
                         <td className="text-center whitespace-normal max-h-16 items-center justify-center">
@@ -227,10 +235,11 @@ const Maintenance = () => {
                             type="button"
                             onClick={() => removeMaintenance(item.codigo)}
                           >
-
-                            <AiOutlineCheck size={32} className="group-hover:fill-white" />
+                            <AiOutlineCheck
+                              size={32}
+                              className="group-hover:fill-white"
+                            />
                           </button>
-
                         </td>
                       </tr>
                     ))}

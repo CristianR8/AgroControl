@@ -21,8 +21,8 @@ export function ModuleSelection() {
     <CardComponent>
 
       <div className="w-full max-w-screen m-auto text-white">
-        <div className="bg-gray-800 mx-52 shadow-md rounded p-4 text-center ">
-          <p className="text-3xl 2xl:text-4xl font-mono font-semibold "> SECCIÓN DE MÓDULOS  </p>
+        <div className="bg-amber-400 mx-52 shadow-md rounded p-4 text-center ">
+          <p className="text-3xl 2xl:text-4xl text-gray-950 font-sans font-semibold "> PRODUCCIONES </p>
 
         </div>
         <div className="flex justify-center">
@@ -31,16 +31,16 @@ export function ModuleSelection() {
         <div className="flex items-center justify-center bg-auto ">
           <div className="flex justify-center gap-4">
             <ImageCard
-              imageSrc="/assets/doc.jpg"
+              imageSrc="/assets/listado.jpg"
               title="Documentación"
-              description="En este módulo encontrarás informacón sobre la documentación de los equipos biomédicos "
+              description="En este módulo podras modificar el listado de producciones"
               onClick={handleDocumentation}
 
             />
             <ImageCard
-              imageSrc="/assets/mantenimiento.jpeg"
+              imageSrc="/assets/cronograma.jpg"
               title="Cronograma de mantenimiento"
-              description="En este módulo podrás ver el cronograma de mantenimiento para los equipos biomédicos"
+              description="En este módulo podrás ver el cronograma de las producciones"
               onClick={handleMaintenance}
             />
           </div>

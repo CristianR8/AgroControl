@@ -169,17 +169,16 @@ const Documentation = () => {
   return (
     <CardComponent>
       <div>
-        <div className="bg-gray-800 text-white shadow-md rounded-lg px-8 p-4 mx-52 text-center">
+        <div className="bg-amber-400 text-gray-900 shadow-md rounded-lg px-8 p-4 mx-52 text-center">
           <p className="text-3xl font-mono 2xl:text-4xl font-semibold ">
-            {" "}
-            BIENVENIDO AL MÓDULO DE DOCUMENTACIÓN{" "}
+            LISTADO DE PRODUCCIONES
           </p>
         </div>
       </div>
       <div className="flex justify-center">
         <div className="flex flex-col items-center">
           <label className="block text-gray-900 text-2xl 2xl:text-3xl font-mono font-semibold mt-4 mb-2 mr-10">
-            Búsqueda de productos
+            Búsqueda de producciones
           </label>
           <form
             onSubmit={(e) => {
@@ -198,7 +197,7 @@ const Documentation = () => {
             <input
               style={{ fontSize: "16px", verticalAlign: "middle", margin: "0" }}
               className="bg-white border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Digita el código o el nombre del producto aqui"
+              placeholder="Digita el código o el nombre de la produccion aqui"
               type="text"
               name="search"
               value={search}

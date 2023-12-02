@@ -4,11 +4,11 @@ const Return = ({ onClick }) => {
 
     return (
         <button
-            className="bg-slate-200 hover:bg-slate-300 rounded m-5 py-2 px-4 text-black text-base md:text-lg flex items-center justify-center space-x-2 mx-auto absolute bottom-0 right-0 p-5"
+            className="bg-slate-200 hover:bg-slate-300 transition-all duration-200 m-5 py-2 px-4 text-green-800 text-base md:text-lg flex rounded-lg items-center justify-center space-x-2 mx-auto absolute bottom-0 right-0 p-5"
             onClick={onClick}
         >
             <svg
-                className="h-8 w-8 2xl:h-12 2xl:w-12 text-gray-900"
+                className="h-8 w-8 2xl:h-12 2xl:w-12 text-green-800"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

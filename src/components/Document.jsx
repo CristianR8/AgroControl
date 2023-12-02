@@ -163,7 +163,7 @@ const Document = () => {
                                 <>
                                     <button
                                         data-tooltip-id="botonUpload"
-                                        className="text-gray-900 text-base md:text-md flex items-center justify-center absolute bottom-0 right-32 2xl:right-40 m-5"
+                                        className="text-green-800 text-base md:text-md flex items-center justify-center absolute bottom-0 right-32 2xl:right-40 m-5"
                                         onClick={() => inputRef.current.click()}
                                     >
                                         <AiOutlineUpload className='md:h-14 md:w-14 2xl:h-16 2xl:w-16 hover:scale-110 duration-200'></AiOutlineUpload>
@@ -177,7 +177,7 @@ const Document = () => {
                                         <Link to='/edit-hv' state={{ title: title, folder: folder, code: String(code), name2: name2 }}>
                                             <button
                                                 data-tooltip-id="botonTooltipEdithv"
-                                                className="text-gray-900 text-base md:text-md flex items-center justify-center absolute bottom-0 right-48 2xl:right-60 m-5">
+                                                className="text-green-800 text-base md:text-md flex items-center justify-center absolute bottom-0 right-48 2xl:right-60 m-5">
                                                 <MdEditDocument onClick={() =>
                                                     navigate('/edit-hv')
                                                 }

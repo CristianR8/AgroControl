@@ -4,7 +4,7 @@ import React from "react";
 const ImageCard = ({ imageSrc, title, description, onClick }) => {
     return (
         <div
-            className="group relative cursor-pointer  items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/20 border-4 border-gray-900 bg-gray-300 rounded-lg"
+            className="group relative cursor-pointer items-center justify-center overflow-hidden hover:shadow-xl hover:border-green-500 transition-all hover:shadow-black/20 border-4 border-green-800 bg-gray-300 rounded-lg"
             onClick={onClick}
         >
             <div className="h-96 2xl:h-custom-xl w-72 2xl:w-80">

@@ -39,7 +39,7 @@ const MntFormProduct = ({ onSubmitFn }) => {
     <form onSubmit={handleSubmit(onSubmitFn)} className='max-w-[400px]-w-full h-full py-16 bg-gray-50 px-8 rounded-lg m-4'>
       <div>
 
-        <label className="block text-gray-900 font-semibold mb-2 text-lg">Digite el código del activo:</label>
+        <label className="block text-gray-900 font-semibold mb-2 text-lg">Digite el código de la produccion:</label>
         <div className="flex items-center mb-12" >
           <BsSearch className='w-7 h-8 mr-3 sm:mb-5 text-gray-900' />
           <Input
@@ -52,7 +52,7 @@ const MntFormProduct = ({ onSubmitFn }) => {
             typeInput="text"
           />
         </div>
-        <label className="block text-gray-800 font-semibold mb-2 text-lg">Seleccione el mes de mantenimiento del activo:</label>
+        <label className="block text-gray-800 font-semibold mb-2 text-lg">Seleccione el mes de la produccion:</label>
 
         <div className='flex items-center'>
           <BsFillCalendarCheckFill className='w-7 h-8 mr-3 text-gray-900' />
@@ -123,9 +123,9 @@ const MntFormProduct = ({ onSubmitFn }) => {
         <button
           type="submit"
           onClick={handleSwal}
-          className="w-3/4 my-5 py-2 mx-16 bg-gray-900 shadow-lg shadow-gray text-lg hover:shadow-gray-900/60 duration-150 text-white font-bold rounded-lg"
+          className="w-3/4 my-5 py-2 mx-16 bg-green-800 text-white shadow-lg shadow-gray text-lg hover:shadow-gray-900/60 duration-150 font-bold rounded-lg"
         >
-          Programar mantenimiento
+          Crear produccion
         </button>
         )}
 
