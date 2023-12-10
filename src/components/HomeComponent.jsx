@@ -20,6 +20,10 @@ export function HomeComponent() {
     navigate("/module");
   };
 
+  const handleCash = async () => {
+    navigate("/cash");
+  };
+
   return (
     <CardComponent>
       <div className="w-full max-w-screen m-auto text-white">
@@ -43,7 +47,7 @@ export function HomeComponent() {
             imageSrc="/assets/saldo.jpg"
             title="Saldo"
             description="En esta sección podras modificar el saldo de tu proyecto"
-            onClick={() => { }}
+            onClick={handleCash}
           />
           
           <button

@@ -5,7 +5,7 @@ export default function InputFile({
 }) {
   return (
       <div className="flex flex-col mr-3 flex-grow">
-          <label className="block text-gray-800 text-xl font-mono text-white font-semibold mt-2 mr-10">
+          <label className="block text-gray-800 text-xl font-monofont-semibold mt-2 mr-10">
               {nameLabel}
           </label>
           <div className="flex">

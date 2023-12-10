@@ -4,10 +4,9 @@ import SearchResults from "./SearchResults";
 import { BsSearch } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 import { useAuth } from "../context/authContext";
-
 
 import Select from "react-select";
 import {
@@ -22,7 +21,7 @@ import {
 import DocsCard from "./DocsCard";
 import Return from "./Return";
 import { firestore, storage } from "../firebase";
-import useSearchStore from '../store/searchStore'
+import useSearchStore from "../store/searchStore";
 import {
   doc,
   getDoc,
@@ -36,31 +35,31 @@ import {
 const Documentation = () => {
   const [result, setResult] = useState([]);
   const [searchResultsByName, setSearchResultsByName] = useState([]);
-  const { search, filter, setSearch } = useSearchStore()
+  const { search, filter, setSearch } = useSearchStore();
 
   const { user, logout } = useAuth();
 
   const suppliers = [
     { value: "1", label: "Código" },
     { value: "2", label: "Nombre" },
-  ]
+  ];
 
   const [searchErrorMessage, setSearchErrorMessage] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleAddProduct = async () => {
     navigate("/add-product");
   };
 
   const handleReturn = async () => {
-    setSearch("")
+    setSearch("");
     navigate("/module");
   };
 
   const handleSelectChange = (e) => {
-    setSearch(search, e)
+    setSearch(search, e);
   };
 
   const handleNameCardClick = (codigo) => {
@@ -71,64 +70,58 @@ const Documentation = () => {
 
   const [searchType, setSearchType] = useState(suppliers[0]);
 
-
-  const searchProductByCode = async (product, filter) => {
-
-    const docRef = doc(firestore, "productos", String(product));
-    const docSnap = await getDoc(docRef);
-    console.log(docSnap.data())
-
-    if (docSnap.exists()) {
-      setResult(docSnap.data());
-      setSearch(product, filter)
-    }
-
-  }
-
-  const searchProductByName = async (product, filter) => {
+  const searchProductByCode = async (codigo) => {
     const q = query(
-      collection(firestore, "productos"),
-      where("nombre", ">=", product),
-      where("nombre", "<=", product + 'z')
+      collection(firestore, "productions"),
+      where("codigo", "==", codigo)
     );
     const querySnapshot = await getDocs(q);
-    console.log(querySnapshot)
-    const searchResults = [];
-    querySnapshot.forEach((doc) => {
-      searchResults.push(doc.data());
 
-    });
-
-    if (searchResults.length > 0) {
-      setSearch(product, filter)
+    if (!querySnapshot.empty) {
+      const searchResults = querySnapshot.docs.map((doc) => doc.data());
       setResult(searchResults);
-
+    } else {
+      console.log("No documents found with codigo:", codigo);
     }
-  }
+  };
+
+  const searchProductByName = async (name) => {
+    const q = query(
+      collection(firestore, "productions"),
+      where("nombre", "==", name)
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const searchResults = querySnapshot.docs.map((doc) => doc.data());
+      setResult(searchResults);
+    } else {
+      console.log("No documents found with codigo:", name);
+    }
+  };
 
   const handleSubmit = async (e) => {
-    setResult([])
+    setResult([]);
     e.preventDefault();
 
     if (!search) {
-      setSearchErrorMessage("Ingrese un valor de búsqueda")
-      return
+      setSearchErrorMessage("Ingrese un valor de búsqueda");
+      return;
     }
 
     if (searchErrorMessage) setSearchErrorMessage(null);
 
-    console.log(filter)
+    console.log(filter);
 
     if (filter.value === "1") {
       // Búsqueda por ID
       searchProductByCode(search, filter);
       setHasSearched(true);
-
     } else if (filter.value === "2") {
       // Búsqueda por nombre
 
       const q = query(
-        collection(firestore, "productos"),
+        collection(firestore, "productions"),
         where("nombre", "==", search) // Busca por el atributo "nombre"
       );
       const querySnapshot = await getDocs(q);
@@ -140,18 +133,14 @@ const Documentation = () => {
 
       if (searchResults.length > 0) {
         setResult(searchResults);
-        
       } else {
         // Manejar el caso en que no se encuentren resultados
         setResult([]);
         setSearchResultsByName(searchResults);
-
       }
-      searchProductByName(search, filter)
+      searchProductByName(search, filter);
       setHasSearched(true);
-
     }
-
   };
 
   useEffect(() => {
@@ -159,12 +148,15 @@ const Documentation = () => {
       console.log(search, filter);
       searchProductByCode(search, filter);
       setHasSearched(true);
-      
-    }
-    else setSearch("")
+    } else setSearch("");
+  }, []);
 
-
-  }, [])
+  const resetSearch = () => {
+    // Aquí estableces el estado relevante a sus valores iniciales
+    setResult([]);
+    setSearch("");
+    // Cualquier otro estado que necesites reiniciar
+  };
 
   return (
     <CardComponent>
@@ -183,7 +175,6 @@ const Documentation = () => {
           <form
             onSubmit={(e) => {
               handleSubmit(e);
-
             }}
             className="flex items-center"
           >
@@ -217,15 +208,12 @@ const Documentation = () => {
               <span className="block sm:inline"> {searchErrorMessage} </span>
             </div>
           )}
-
         </div>
       </div>
 
       {result.length !== 0 && (
-
         <div className="container mt-4">
-          <SearchResults searchResults={result} />
-
+          <SearchResults searchResults={result} resetSearch={resetSearch} />
         </div>
       )}
 
@@ -237,29 +225,27 @@ const Documentation = () => {
               <li key={index}>{item.nombre}</li>
             ))}
           </ul>
-
         </div>
       )}
 
       <div className="absolute" style={{ right: 0, bottom: 4 }}>
-
-        {hasSearched === false && !search && user.role == "admin" && (
-
+        {hasSearched === false && !search && (
           <button
             data-tooltip-id="botonTooltipAdd"
-            className="text-gray-900 text-base md:text-md flex items-center justify-center absolute bottom-0 right-32 2xl:right-44 m-5"
+            className="text-green-800 text-base md:text-md flex items-center justify-center absolute bottom-0 right-32 2xl:right-44 m-5"
           >
-            <FaPlusSquare className="z-0 md:h-14 md:w-14 2xl:h-16 2xl:w-16 hover:scale-110 duration-200" onClick={handleAddProduct} />
+            <FaPlusSquare
+              className="z-0 md:h-14 md:w-14 2xl:h-16 2xl:w-16 hover:scale-110 duration-200"
+              onClick={handleAddProduct}
+            />
             <Tooltip id="botonTooltipAdd" effect="float">
-
-              Agregar documento
+              Crear produccion
             </Tooltip>
           </button>
         )}
       </div>
 
       <Return onClick={handleReturn} />
-
     </CardComponent>
   );
 };

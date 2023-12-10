@@ -19,9 +19,8 @@ import Return from "./Return";
 import { useAuth } from "../context/authContext";
 
 const Maintenance = () => {
-  const [report, setReport] = useState([]);
-  const [filter, setFilter] = useState("Todos");
-  const { user, logout } = useAuth();
+  const [productions, setProductions] = useState([]);
+  const [filter, setFilter] = useState("Todos")
 
   const navigate = useNavigate();
 
@@ -29,15 +28,29 @@ const Maintenance = () => {
     navigate("/module");
   };
 
-  const onSubmitFunction = async (data) => {
-    let { codigo, fecha } = data;
-    await updateDoc(doc(firestore, "productos", String(codigo)), {
-      maintenance: fecha,
-    });
-    retrieveData();
+  const retrieveData = async () => {
+    const querySnapshot = await getDocs(collection(firestore, "productions"));
+    const productionsData = querySnapshot.docs.map((doc) => ({
+      codigo: doc.codigo,
+      ...doc.data(),
+    }));
+    setProductions(productionsData);
   };
 
-  const calculateSemaforizacion = (fecha) => {
+  const onSubmitFunction = async (data) => {
+    let { codigo, mes } = data;
+    try {
+      await updateDoc(doc(firestore, "productions", String(codigo)), {
+        mes: mes,
+      });
+      Swal.fire("Éxito", "Mes de mantenimiento asignado", "success");
+      retrieveData();
+    } catch (error) {
+      Swal.fire("Error", "No se pudo asignar el mes de mantenimiento", "error");
+    }
+  };
+
+  const calculateSemaforizacion = (mes) => {
     const months = {
       Enero: 1,
       Febrero: 2,
@@ -56,45 +69,19 @@ const Maintenance = () => {
     let today = new Date();
     let currentMonth = today.getMonth() + 1;
 
-    return currentMonth === months[fecha]
-      ? today.getDate() < 20
-        ? "verde"
-        : "amarillo"
-      : currentMonth < months[fecha]
-      ? "verde"
-      : "rojo";
-  };
-
-  const retrieveData = async () => {
-    let q;
-    if (filter !== "Todos") {
-      q = query(
-        collection(firestore, "productos"),
-        where("maintenance", "==", filter)
-      );
+    if (currentMonth === months[mes]) {
+      return "amarillo";
+    } else if (currentMonth < months[mes]) {
+      return "verde";
     } else {
-      q = collection(firestore, "productos");
+      return "rojo"; 
     }
-
-    const querySnapshot = await getDocs(q);
-
-    let data = querySnapshot.docs
-      .filter((doc) => {
-        return doc.data().maintenance !== undefined;
-      })
-      .map((doc) => {
-        let type_semf = calculateSemaforizacion(doc.data().maintenance);
-        return { ...doc.data(), semaforizacion: type_semf };
-      });
-
-    setReport(data);
   };
-
   const removeMaintenance = async (codigo) => {
     console.log(codigo);
     Swal.fire({
       title: "¿Estas seguro?",
-      text: "¡Esta acción removerá el producto de la tabla de mantenimiento!",
+      text: "¡Esta acción removerá la produccion de la tabla!",
       icon: "warning",
       showDenyButton: true,
       denyButtonText: "Cancelar",
@@ -103,14 +90,10 @@ const Maintenance = () => {
       confirmButtonText: "Si, completar!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await updateDoc(doc(firestore, "productos", String(codigo)), {
-          maintenance: deleteField(),
+        await updateDoc(doc(firestore, "productions", String(codigo)), {
+          tipo: deleteField(),
         });
-        Swal.fire(
-          "¡Mantenimiento completado!",
-          "Se ha completado el mantenimiento.",
-          "success"
-        );
+        Swal.fire("¡Produccion finalizada!", "success");
         retrieveData();
       }
     });
@@ -118,7 +101,7 @@ const Maintenance = () => {
 
   useEffect(() => {
     retrieveData();
-  }, [filter]);
+  }, []);
 
   return (
     <CardComponent>
@@ -166,7 +149,7 @@ const Maintenance = () => {
                       <th className="px-4">Tipo</th>
                       <th className="px-8">Código</th>
                       <th>Nombre</th>
-                      <th className="px-4">Fecha</th>
+                      <th className="px-4">Mes</th>
                       <th className="px-2">
                         <AiOutlineWarning
                           data-tooltip-id="botonInfo"
@@ -199,7 +182,7 @@ const Maintenance = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {report.map((item, index) => (
+                    {productions.map((production, index) => (
                       <tr
                         key={index}
                         className={`${
@@ -207,23 +190,23 @@ const Maintenance = () => {
                         } hover:bg-gray-900 hover:text-white transition duration-200 group`}
                       >
                         <td className="text-center whitespace-normal max-h-16">
-                          {item.ciudad}
+                          {production.tipo}
                         </td>
                         <td className="text-center whitespace-normal max-h-16	">
-                          {item.codigo}
+                          {production.codigo}
                         </td>
                         <td className="text-center whitespace-normal max-h-16	">
-                          {item.nombre}
+                          {production.nombre}
                         </td>
                         <td className="text-center whitespace-normal max-h-16	">
-                          {item.maintenance}
+                          {production.maintenance}
                         </td>
                         <td className=" whitespace-nowrap">
                           <span
                             className={`w-10 h-10 m-2 rounded-full inline-block ${
-                              item.semaforizacion === "verde"
+                              production.semaforizacion === "verde"
                                 ? "bg-green-400"
-                                : item.semaforizacion === "amarillo"
+                                : production.semaforizacion === "amarillo"
                                 ? "bg-yellow-300"
                                 : "bg-red-500"
                             }`}
@@ -233,7 +216,7 @@ const Maintenance = () => {
                           <button
                             className="hover:bg-gray-700 hover:shadow-white text-gray-800 font-bold rounded-lg p-2 hover:scale-125 duration-200  "
                             type="button"
-                            onClick={() => removeMaintenance(item.codigo)}
+                            onClick={() => removeMaintenance(production.codigo)}
                           >
                             <AiOutlineCheck
                               size={32}

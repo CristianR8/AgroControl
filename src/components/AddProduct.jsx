@@ -6,16 +6,13 @@ import Select from "react-select";
 import Input from "./Input";
 import InputFile from "./InputFIle";
 import InputFileTwo from "./InputFileTwo";
-import { Link } from 'react-router-dom';
-import Spinner from "./Spinner"
-
+import { Link } from "react-router-dom";
+import Spinner from "./Spinner";
+import { doc, getDocs, setDoc, updateDoc, collection } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-
 import { firestore, storage } from "../firebase";
 import { ref, uploadBytes } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore";
-
-import useAddProductStore from '../store/addproductStore'
+import useAddProductStore from "../store/addproductStore";
 import { DocGenerator } from "../services/DocGenerator";
 
 const uploadPdf = async (pdf, folder) => {
@@ -31,106 +28,57 @@ const AddProduct = () => {
     register,
     handleSubmit,
     formState: { errors },
-    getValues,
-    setValue
   } = useForm();
-
-  const { hv,rps,data, setData, setHv, setRps } = useAddProductStore()
-
-
-
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data) => {
+  const { data } = useAddProductStore();
+
+  const onSubmit = async (formData) => {
     setLoading(true);
 
-    const nuevoObjeto = {};
-    const names = {};
-
-    for (const key in data) {
-      if (data[key] instanceof FileList && data[key].length > 0) {
-        nuevoObjeto[key] = data[key][0];
-      }
-    }
-
-    Object.keys(nuevoObjeto).forEach((key) => {
-      names[key] = nuevoObjeto[key].name;
+    // Añadir el nuevo producto
+    const newProductRef = doc(firestore, "productions", formData.codigo);
+    await setDoc(newProductRef, {
+      nombre: formData.nombre,
+      codigo: formData.codigo,
+      monto: formData.monto,
+      ciudad: formData.ciudad,
+      tipo: formData.tipo,
+      mes: formData.mes,
+      fechaCreacion: formData.fechaCreacion,
     });
 
-
-    if (Object.keys(hv).length) {
-      names.hv = String(hv.inventario) + ".docx";
-    }
-    if (Object.keys(rps).length) {
-      names.rps = rps.numeroInventario + ".docx";
-    }
-
-    console.log(names)
-
-    setDoc(doc(firestore, "productos", data.codigo), {
-      nombre: data.nombre,
-      lote: data.lote,
-      ciudad: data.ciudad,
-      codigo: data.codigo,
-      ...names,
-    });
-
-    const files = Object.keys(nuevoObjeto).map((key) => ({
-      folder: key,
-      file: nuevoObjeto[key],
-    }));
-
-    let promises = files.map((file) => uploadPdf(file.file, file.folder));
-
-    const filesRes = await Promise.all(promises);
-
-    if (Object.keys(hv).length) {
-      let images = {imagenesEquipo: hv.imagenesEquipo, firma: hv.firma}
-      DocGenerator("formularioEditHV", {...hv, ...images}, names.hv  , 'hv');
-    }
-
-    if (Object.keys(rps).length) {
-      let images = {FirmaEntrego: rps.FirmaEntrego, FirmaRecibio: rps.FirmaRecibio, FirmaResponsable:rps.FirmaResponsable}
-      DocGenerator("formularioEditRS", {...rps, ...images}, names.rps, 'rps');
+    // Actualizar el saldo
+    const saldosRef = collection(firestore, "saldos");
+    const querySnapshot = await getDocs(saldosRef);
+    if (!querySnapshot.empty) {
+      const saldoDocRef = querySnapshot.docs[0].ref; // Tomar el primer documento de saldos
+      const saldoActual = querySnapshot.docs[0].data().monto;
+      const nuevoSaldo = parseFloat(saldoActual) - parseFloat(formData.monto);
+      await updateDoc(saldoDocRef, { monto: nuevoSaldo });
+      console.log("Saldo actualizado con éxito");
+    } else {
+      console.log("No se encontró ningún documento de saldo.");
+      // Aquí podrías manejar la creación de un nuevo saldo si es necesario
     }
 
     setLoading(false);
-    setData({})
-    setHv({})
-    setRps({})
-    navigate("/documentation");
-
+    navigate("/documentation"); // Redirigir al usuario
   };
 
-  const handleReturn = async () => {
-    setData({})
-    setHv({})
-    setRps({})
+  const handleReturn = () => {
     navigate("/documentation");
   };
 
-  const handlehv = () => {
-    setData(getValues())
-  };
-
-
-  const documents = [
-    { value: "1", label: "Hoja de vida" },
-    { value: "2", label: "Guía de manejo rapido" },
-    { value: "3", label: "Ficha tecnica" },
-    { value: "4", label: "Manual de usuario" },
-    { value: "5", label: "Hoja de vida personal" },
-    { value: "6", label: "Protocolo de limpieza" },
-  ];
-
-  return (
-    loading ? <Spinner/> : (
+  return loading ? (
+    <Spinner />
+  ) : (
     <CardComponent>
       <div>
-        <div className="bg-gray-400 shadow-md rounded-lg px-8 p-4 mx-52 text-center">
+        <div className="bg-amber-400 shadow-md rounded-lg px-8 p-4 mx-52 text-center">
           <p className="text-3xl font-mono font-semibold ">
             {" "}
-            Agregar productos{" "}
+            Crear produccion{" "}
           </p>
         </div>
       </div>
@@ -138,22 +86,19 @@ const AddProduct = () => {
       <div className="flex justify-center mt-4">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="grid grid-cols-1 sm:grid-cols-1 gap-4 bg-gray-950 bg-opacity-100 2xl:flex-row items-center justify-center rounded-lg shadow-lg py-2 px-8 mx-2 w-3/4 2xl:w-1/2 text-cente "
+          className="grid grid-cols-1 sm:grid-cols-1 gap-4 bg-green-950 bg-opacity-100 2xl:flex-row items-center justify-center rounded-lg shadow-lg py-2 px-8 mx-2 w-3/4 2xl:w-1/2 text-cente "
         >
           <div className="flex flex-row text-gray-400 w-full">
             <div className="flex flex-col mr-3 flex-grow">
               <label className="block text-xl font-mono text-white font-semibold mt-4 mr-10 ">
                 Nombre
               </label>
-              <Input
-                errors={errors}
-                register={register}
+              <input
                 nameRegister="nombre"
                 type="text"
                 placeholder="Nombre"
+                {...register("nombre", { required: true })}
                 className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
-                defaultValue={data.nombre} 
-                //{...register("nombre", { required: true })}
               />
               {errors.nombre && (
                 <span className="text-red-500 text-sm">
@@ -166,15 +111,12 @@ const AddProduct = () => {
               <label className="block text-xl font-mono text-white font-semibold mt-4 mr-10">
                 Codigo
               </label>
-              <Input
-                errors={errors}
-                register={register}
+              <input
                 nameRegister="codigo"
                 type="text"
                 placeholder="Codigo"
                 className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
-                defaultValue={data.codigo}
-                //{...register("nombre", { required: true })}
+                {...register("codigo", { required: true })}
               />
               {errors.codigo && (
                 <span className="text-red-500 text-sm">
@@ -182,26 +124,21 @@ const AddProduct = () => {
                 </span>
               )}
             </div>
-
           </div>
 
-          <div className="flex flex-row text-gray-400 w-full">
+          <div className="flex flex-grow text-gray-400">
             <div className="flex flex-col mr-3 flex-grow">
-
-              <label className="block text-gray-800 text-xl font-mono text-white font-semibold mt-2 mr-10">
-                Lote
+              <label className="block text-xl font-mono text-white font-semibold mt-2 mr-10">
+                Monto
               </label>
-              <Input
-                errors={errors}
-                register={register}
-                nameRegister="lote"
+              <input
+                nameRegister="monto"
                 type="text"
-                placeholder="Lote"
+                placeholder="Monto"
                 className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
-                defaultValue={data.lote}
-                //{...register("nombre", { required: true })}
+                {...register("monto", { required: true })}
               />
-              {errors.lote && (
+              {errors.monto && (
                 <span className="text-red-500 text-sm">
                   Este campo es obligatorio
                 </span>
@@ -209,20 +146,16 @@ const AddProduct = () => {
             </div>
 
             <div className="flex flex-col flex-grow">
-
               <label className="block text-xl font-mono text-white font-semibold mt-2 mr-10">
-
                 Ciudad
               </label>
-              <Input
-                errors={errors}
-                register={register}
+              <input
                 nameRegister="ciudad"
                 type="text"
                 placeholder="Ciudad"
                 className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
                 defaultValue={data.ciudad}
-                //{...register("nombre", { required: true })}
+                {...register("ciudad", { required: true })}
               />
               {errors.ciudad && (
                 <span className="text-red-500 text-sm">
@@ -232,81 +165,76 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="flex flex-row text-gray-400 w-full">
+          <div className="flex flex-grow text-gray-400">
+            <div className="flex flex-col mr-3 flex-grow">
+              <label className="block text-xl font-mono text-white font-semibold mt-2 mr-10">
+                Tipo
+              </label>
+              <input
+                nameRegister="tipo"
+                type="text"
+                placeholder="Tipo"
+                className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
+                {...register("tipo", { required: true })}
+              />
+              {errors.tipo && (
+                <span className="text-red-500 text-sm">
+                  Este campo es obligatorio
+                </span>
+              )}
+            </div>
 
-            <InputFileTwo
-              nameLabel="Hoja de vida"
-              nameRegister="hv"
-              register={register}
-              routeTo="/edit-hv"
-              onClick={handlehv}
-              Submitted={`${Object.keys(hv).length ? 'green' : 'gray'}`}
-            />
-            
- 
-            <InputFileTwo
-              nameLabel="Reporte de servicio"
-              nameRegister="rps"
-              register={register}
-              routeTo="/edit-rs"
-              Submitted={`${Object.keys(rps).length ? 'green' : 'gray'}`}
+            <div className="flex flex-col flex-grow">
+              <label className="block text-xl font-mono text-white font-semibold mt-2 mr-10">
+                Mes
+              </label>
+              <input
+                nameRegister="mes"
+                type="text"
+                placeholder="Digita el mes aqui"
+                className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
+                {...register("mes", { required: true })}
+              />
+              {errors.mes && (
+                <span className="text-red-500 text-sm">
+                  Este campo es obligatorio
+                </span>
+              )}
+            </div>
+          </div>
 
-            />
+          <div className="flex flex-grow text-gray-400">
+            <div className="flex flex-col mr-3 flex-grow">
+              <label className="block text-xl font-mono text-white font-semibold mt-2 mr-10">
+                Fecha de creacion
+              </label>
+              <input
+                type="date"
+                className="border border-gray-400 rounded-lg px-4 w-full text-gray-600"
+                {...register("fechaCreacion", { required: true })}
+              />
+              {errors.fechaCreacion && (
+                <span className="text-red-500 text-sm">
+                  Este campo es obligatorio
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-row text-gray-400 w-full">
-            <InputFile
-              nameLabel="Guia de manejo"
-              nameRegister="gmr"
-              register={register}
-            />
-
-            <InputFile
-              nameLabel="Ficha tecnica"
-              nameRegister="ft"
-              register={register}
-            />
-          </div>
-
-          <div className="flex flex-row text-gray-400 w-full">
-            <InputFile
-              nameLabel="Protocolo de limpieza"
-              nameRegister="ptl"
-              register={register}
-            />
-
-            <InputFile
-              nameLabel="Manual usuario"
-              nameRegister="mu"
-              register={register}
-            />
-          </div>
-
-          <div className="flex flex-row text-gray-400 w-full">
-            <InputFile
-              nameLabel="Hoja de vida personal"
-              nameRegister="hvp"
-              register={register}
-            />
+            <InputFileTwo Submitted={`${Object ? "green" : "gray"}`} />
           </div>
 
           <div className="flex w-full text-gray-400 py-2">
-            <button 
-            className="w-full text-xl my-5 py-2 bg-gray-400 hover:shadow-lg hover:shadow-gray-500/40 duration-150 text-gray-800 font-bold rounded-lg"
-
-            >
-              
+            <button className="w-full text-xl my-5 py-2 bg-gray-200 hover:shadow-lg hover:shadow-gray-500/40 duration-150 text-gray-800 font-bold rounded-lg">
               Agregar
             </button>
           </div>
-
-          
         </form>
       </div>
 
       <Return onClick={handleReturn} />
     </CardComponent>
-    )
   );
 };
 

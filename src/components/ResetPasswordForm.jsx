@@ -58,19 +58,19 @@ export default function ResetPasswordForm() {
       <div className="hidden sm:block">
         <img
           className="w-full h-full rounded-l-lg object-cover shadow-[0_3px_10px_rgb(0,0,0,0.5)]"
-          src="/assets/lineas1.jpg"
+          src="/assets/agro.jpg"
           alt="Login"
         />
       </div>
       <div className="bg-fray-800 flex flex-col bg-stone-200 relative justify-center rounded-r-lg shadow-[0_3px_10px_rgb(0,0,0,0.5)]">
         <form
           onSubmit={handleSubmit(onSubmitFunction)}
-          className="max-w-[400px]-w-full mx-20 bg-gray-900 p-10 px-8 rounded-lg"
+          className="max-w-[400px]-w-full mx-20 bg-amber-500 p-10 px-8 rounded-lg"
         >
-          <h2 className="text-4xl text-white font-bold text-center">
+          <h2 className="text-4xl text-gray-900 font-bold text-center">
             RECUPERAR CONTRASEÑA
           </h2>
-          <div className="flex flex-col text-gray-400 py-2">
+          <div className="flex flex-col text-gray-950 py-2">
             <label>Correo electrónico</label>
             <Input
               errors={errors}
@@ -78,14 +78,14 @@ export default function ResetPasswordForm() {
               register={register}
               nameRegister="email"
               placeholder="tucorreo@gmail.com"
-              className="rounded-lg bg-gray-700 mt-2 p-2 focus:border-bñlue-500 focus:bg-gray-800 focus:outline-none"
+              className="rounded-lg bg-gray-100 mt-2 p-2 focus:border-bñlue-500 focus:bg-gray-200 focus:outline-none"
               type="text"
             />
           </div>
 
 
 
-          <button onClick={handleSwalReset} className="w-full my-5 py-2 duration-200 bg-stone-400 shadow-lg shadow-teal hover:shadow-teal-50/30 text-gray-800 font-bold rounded-lg">
+          <button onClick={handleSwalReset} className="w-full my-5 py-2 duration-200 bg-stone-200 shadow-lg shadow-teal hover:shadow-teal-50/30 text-gray-800 font-bold rounded-lg">
             RECUPERAR
           </button>
         </form>
