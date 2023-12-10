@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { query, where, addDoc, getDocs, collection } from 'firebase/firestore';
+import { firestore } from "../firebase"; 
 
 const DocsCard = ({ document, onUpdate }) => {
   const [transactionType, setTransactionType] = useState("ingreso"); // 'ingreso' o 'gasto'
@@ -17,12 +19,33 @@ const DocsCard = ({ document, onUpdate }) => {
     setTransactionType(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const numericAmount = parseFloat(amount);
     if (isNaN(numericAmount)) {
       alert("Por favor, introduce un número válido.");
       return;
+    }
+
+    // Preparar la transacción para añadir a Firestore
+    const newTransaction = {
+      codigoProducto: docData.codigo,
+      type: transactionType,
+      amount: numericAmount,
+      concept,
+    };
+
+    try {
+      // Agregar la nueva transacción a la colección `transacciones`
+      await addDoc(collection(firestore, "transacciones"), newTransaction);
+
+      // Actualizar la lista de transacciones en el estado local
+      setTransactions([...transactions, newTransaction]);
+
+      // Aquí podrías querer también actualizar el monto en el documento de `producciones`
+      // pero eso dependerá de cómo quieres manejar los montos totales
+    } catch (error) {
+      console.error("Error al agregar la transacción:", error);
     }
 
     setTransactions([
@@ -43,6 +66,33 @@ const DocsCard = ({ document, onUpdate }) => {
   };
 
   const docData = document;
+
+  // Dentro de tu componente DocsCard
+  useEffect(() => {
+    const loadTransactions = async () => {
+      try {
+        // Suponiendo que cada transacción es un documento en la colección `transacciones`
+        // y tiene un campo `codigoProducto` que corresponde al `codigo` del documento de `producciones`
+        const q = query(
+          collection(firestore, "transacciones"),
+          where("codigoProducto", "==", docData.codigo)
+        );
+        const querySnapshot = await getDocs(q);
+
+        const loadedTransactions = [];
+        querySnapshot.forEach((doc) => {
+          loadedTransactions.push(doc.data());
+        });
+
+        // Establecer el estado de transacciones con las transacciones cargadas
+        setTransactions(loadedTransactions);
+      } catch (error) {
+        console.error("Error al cargar las transacciones:", error);
+      }
+    };
+
+    loadTransactions();
+  }, [docData.codigo]);
 
   return (
     <div className="flex justify-center items-center w-screen">
@@ -122,6 +172,24 @@ const DocsCard = ({ document, onUpdate }) => {
             </button>
           </div>
         </form>
+        <div className="mt-4 p-4">
+          <h3 className="text-lg font-semibold">Transacciones:</h3>
+          <ul>
+            {transactions.map((transaction, index) => (
+              <li
+                key={index}
+                className={`${
+                  transaction.type === "ingreso"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {transaction.type.toUpperCase()}: ${transaction.amount} -{" "}
+                {transaction.concept}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
