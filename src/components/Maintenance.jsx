@@ -20,7 +20,7 @@ import { useAuth } from "../context/authContext";
 
 const Maintenance = () => {
   const [productions, setProductions] = useState([]);
-  const [filter, setFilter] = useState("Todos")
+  const [filter, setFilter] = useState("Todos");
 
   const navigate = useNavigate();
 
@@ -65,16 +65,18 @@ const Maintenance = () => {
       Noviembre: 11,
       Diciembre: 12,
     };
+    
 
     let today = new Date();
     let currentMonth = today.getMonth() + 1;
+    console.log("Mes de producción:", mes, "Mes actual:", currentMonth);
 
     if (currentMonth === months[mes]) {
       return "amarillo";
-    } else if (currentMonth < months[mes]) {
+    } else if (currentMonth > months[mes]) {
       return "verde";
     } else {
-      return "rojo"; 
+      return "rojo";
     }
   };
   const removeMaintenance = async (codigo) => {
@@ -182,50 +184,58 @@ const Maintenance = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {productions.map((production, index) => (
-                      <tr
-                        key={index}
-                        className={`${
-                          index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                        } hover:bg-gray-900 hover:text-white transition duration-200 group`}
-                      >
-                        <td className="text-center whitespace-normal max-h-16">
-                          {production.tipo}
-                        </td>
-                        <td className="text-center whitespace-normal max-h-16	">
-                          {production.codigo}
-                        </td>
-                        <td className="text-center whitespace-normal max-h-16	">
-                          {production.nombre}
-                        </td>
-                        <td className="text-center whitespace-normal max-h-16	">
-                          {production.maintenance}
-                        </td>
-                        <td className=" whitespace-nowrap">
-                          <span
-                            className={`w-10 h-10 m-2 rounded-full inline-block ${
-                              production.semaforizacion === "verde"
-                                ? "bg-green-400"
-                                : production.semaforizacion === "amarillo"
-                                ? "bg-yellow-300"
-                                : "bg-red-500"
-                            }`}
-                          ></span>
-                        </td>
-                        <td className="text-center whitespace-normal max-h-16 items-center justify-center">
-                          <button
-                            className="hover:bg-gray-700 hover:shadow-white text-gray-800 font-bold rounded-lg p-2 hover:scale-125 duration-200  "
-                            type="button"
-                            onClick={() => removeMaintenance(production.codigo)}
-                          >
-                            <AiOutlineCheck
-                              size={32}
-                              className="group-hover:fill-white"
-                            />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {productions.map((production, index) => {
+                      // Calcula la semaforización basada en el mes de la producción
+                      const semaforizacion = calculateSemaforizacion(
+                        production.mes
+                      );
+                      return (
+                        <tr
+                          key={index}
+                          className={`${
+                            index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                          } hover:bg-gray-900 hover:text-white transition duration-200 group`}
+                        >
+                          <td className="text-center whitespace-normal max-h-16">
+                            {production.tipo}
+                          </td>
+                          <td className="text-center whitespace-normal max-h-16	">
+                            {production.codigo}
+                          </td>
+                          <td className="text-center whitespace-normal max-h-16	">
+                            {production.nombre}
+                          </td>
+                          <td className="text-center whitespace-normal max-h-16	">
+                            {production.mes}
+                          </td>
+                          <td className="whitespace-nowrap">
+                            <span
+                              className={`w-10 h-10 m-2 rounded-full inline-block ${
+                                semaforizacion === "verde"
+                                  ? "bg-green-400"
+                                  : semaforizacion === "amarillo"
+                                  ? "bg-yellow-300"
+                                  : "bg-red-500"
+                              }`}
+                            ></span>
+                          </td>
+                          <td className="text-center whitespace-normal max-h-16 items-center justify-center">
+                            <button
+                              className="hover:bg-gray-700 hover:shadow-white text-gray-800 font-bold rounded-lg p-2 hover:scale-125 duration-200  "
+                              type="button"
+                              onClick={() =>
+                                removeMaintenance(production.codigo)
+                              }
+                            >
+                              <AiOutlineCheck
+                                size={32}
+                                className="group-hover:fill-white"
+                              />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
