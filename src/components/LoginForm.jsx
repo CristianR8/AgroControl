@@ -127,6 +127,12 @@ export default function LoginForm() {
           <button className="w-full my-5 py-2 bg-stone-300 shadow-lg duration-200 shadow-teal hover:shadow-teal-50/70 text-gray-800 font-bold rounded-lg">
             INGRESAR
           </button>
+          <button
+            className="my-5 p-4 bg-green-800 shadow-lg duration-200 shadow-teal hover:shadow-teal-50/70 text-gray-100 font-bold rounded-lg"
+            onClick={() => navigate("/register")}
+          >
+            REGISTRARSE
+          </button>
         </form>
       </div>
     </div>
