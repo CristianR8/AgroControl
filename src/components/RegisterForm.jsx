@@ -10,8 +10,6 @@ import validationLogin from "../validations/ValidationLogin";
 export default function RegisterForm() {
   const { signup } = useAuth();
 
-  /* const [error, setError] = useState(null); */
-
   const [visible, setVisible] = useState(false);
 
   const [user, setUser] = useState({
@@ -30,6 +28,7 @@ export default function RegisterForm() {
       await signup(user.email, user.password);
       navigate("/auth");
     } catch (error) {
+      console.error("Error during sign up:", error);
       setError(error.message);
     }
   };

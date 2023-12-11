@@ -16,7 +16,7 @@ export default function LoginForm() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },z
+    formState: { errors },
   } = useForm();
 
   useEffect(() => {
@@ -96,6 +96,7 @@ export default function LoginForm() {
               placeholder="***********"
               className="w-full rounded-lg bg-white mt-2 p-2 focus:border-blue-500 focus:bg-gray-100 focus:outline-none"
               typeInput={visible === false ? "password" : "text"}
+              onChange={handleRememberChange}
             />
             <div className="text-2xl absolute my-11 right-2 text-gray-400">
               {visible === false ? (
